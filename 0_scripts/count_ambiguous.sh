@@ -37,12 +37,8 @@ fi
 #adds # to the beginning and end of each '>'| removes all new lines | #adds new line | removes empty lin
 fasta_clean=$(sed -e 's/\(^>.*$\)/#\1#/' "$fasta_file" | tr -d '\n' | sed -e 's/#/\n/g' | grep -v '^$')
 
-#echo "fasta file output of the fasta_clean step below:"
-#printf "%s\n" "$fasta_clean"
-#echo -e "\n"
-
 printf "%s\n" "$fasta_clean" > 2_mid/clean.fasta
-#echo -e $fasta_clean > 2_mid/clean.fasta
+
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -62,9 +58,20 @@ echo "Processing file with $seq_num sequences..."
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #echo "output of all nucleotide calls per sample:"
 all_count=$(printf "%s\n" "$fasta_clean" | awk '!/^>/ { print length($0) }') 
-#printf "%s\n" "$all_count"
+
+#save to file
 printf "%s\n" "$all_count" > 2_mid/all_count.txt
-#echo -e "\n"
+
+
+#get count of total nucleotides by:
+#1 removing headers
+#2 keep only real characters
+#count number
+total_nucleotides=$(grep -v '^>' $fasta_file| tr -cd '[:alnum:]' | wc -m)
+
+avg_all=$((total_nucleotides / seq_num))
+
+echo "Average sequence length: $avg_all"
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -74,10 +81,16 @@ printf "%s\n" "$all_count" > 2_mid/all_count.txt
 #remove the ambiguous characters by only keeping ATCG in lines that arent in the headers
 ATCG_fasta=$(echo "$fasta_clean" | sed '/^>/!s/[^ATCG]//gi')
 
-#check your output 
-#echo "fasta file output of removing ambiguous characters:"
-#printf "%s\n" "$ATCG_fasta"
-#echo -e "\n"
+#get count of total nucleotides by
+#1 removing headers
+#2 keeping only ATCG
+#3 keep only real characters
+#4 counting characters
+total_nucleotides=$(grep -v '^>' $fasta_file| sed '/^>/!s/[^ATCG]//gi'| tr -cd '[:alnum:]' | wc -m)
+
+avg_all=$((total_nucleotides / seq_num))
+
+echo "Average nonambiguous sequence length: $avg_all"
 
 #save output
 printf "%s\n" "$ATCG_fasta" > 2_mid/atcg.fasta
@@ -87,15 +100,13 @@ printf "%s\n" "$ATCG_fasta" > 2_mid/atcg.fasta
 #GET NONAMBIG COUNTS
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #get counts
-#echo "Count of all nonambiguous nucleotide calls per sample:"
 
-#count the characters in each line that doesn't start with '>'
+#count the characters in each line by:
+#1 dont count rows that start with header ">"
+# print length
 nonambig_count=$(printf "%s\n" "$ATCG_fasta" | awk '!/^>/ { print length($0) }')
-#printf "%s\n" "$nonambig_count" #print to console
+
 printf "%s\n" "$nonambig_count" > 2_mid/nonambig_count.txt #save for csv
-#echo -e "\n"
-
-
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
