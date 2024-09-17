@@ -1,35 +1,95 @@
-#!/usr/bin/env bash
-
 #Final Exam
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q1
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+File Type: fasta 
+Information: sequence name followed by the sequence itself.
+Organization: different fasta files are delimited by ">" followed by the header. The next proceedings lines are the sequence, usually 60-80 characters at a time. The next sequence is identified by another ">"
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q2
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+A. What is the operation your script will perform?
+My script flattens a line broken sequence into a single line for multiple fastas within a single file.
+Counts the number of ambiguous and nonamiguous nucleotide calls in order to get a quick summary of total genome coverage. 
 
+Saves output to a csv file
 
+B. Why is this a useful operation to do in your field or in your project?
+
+I study arboviruses using genomic epidemiological techniques such as discreet phylogeography which requires fairly complete whole genome sequences for tree reconstruction.
+
+C. Outline a few key commands or steps your script will do.
+
+This string of commands flattens the sequence files:
+1. the first command adds # to the beginning and end of the sequence name lines, which are denoted by >
+2. the second line removes all new line breaks
+3. the 3rd piped command replaces the # with new line breaks.
+4. the 4th command removes empty lines that are created as an artifact of the process
+fasta_clean=$(sed -e 's/\(^>.*$\)/#\1#/' "$fasta_file" | tr -d '\n' | sed -e 's/#/\n/g' | grep -v '^$')
+
+This string of commands counts the number of non ambiguous sequences:
+1. the first piped command prints the output of the ATCG_fasta
+2. The second piped awk command counts the number of characters that dont start with > to avoid counting headers.
+nonnambig_count=$(printf "%s\n" "$ATCG_fasta" | awk '!/^>/ { print length($0) }')
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q3
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+A. An input file is any fasta file.
+B. The output is a csv file with the filename, nonambiguous and total nucleotides per sequence.
+3. bash 0_scripts/count_ambiguous.sh 1_input/test.fasta
 
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q4
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+see attached or 
 
+git clone the repository here:
+git clone https://github.com/rtobiaskoch/tk_biotools.git
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q5
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#!/bin/bash
 
+
+# Make a backup directory if it doesn't already exist
+mkdir -p backups
+ 
+# Acquire the input filename. ## Hint - change this line to acquire multiple files
+file_type=$1
+inputfiles=$(find . -name "$file_type" | sed 's|^\./||')
+
+#loop through and mv  
+   for file in ${inputfiles[@]}; do
+       
+    # Substring replacement to create an output file name
+   outputfile=$(echo -e "backups/"$file"_bkp.txt")
+   echo -e "\nBacking up $file. Saving it as $outputfile in backup directory\n"
+    # Save the backup 
+  cp $file $outputfile
+    
+   done
+
+
+ echo -e "saveBackups.sh program complete\n"
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #Q6
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+cut -f 3 SARSCoV2_ncbiGenes.gtf | sort | uniq -c
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#Q6
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+For my research I help manage the West nile surveillance program in Northern Colorado. I currently have a series of R scripts that helps process the testing data and create reports, but many things have to go right for it to work. Many people to submit data are very creative in how they make mistakes. I would like the script to be more flexible with its inputs and have more checks so that someone else would be able to run the script without much assistance from me. 
+
+After doing some research it looks like I can incorporate some of the same functionality as is done in bash by incorporating functions like readlines() and commandArgs(). This could help me add options for the user to use some different scripts if certain things weren't working correctly. For example, lab techs sometimes mix up the standards that calculate the WNV copy number. I could potentially add an option that would calculate the copy from historical standards. 

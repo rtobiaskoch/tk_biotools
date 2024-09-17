@@ -28,7 +28,7 @@ fi
 # Assign the folder path to a variable
 folder_path="3_output"
 
-# Check if the mid folder exists
+# Check if the output folder exists
 if [ ! -d "$folder_path" ]; then
     # If the folder does not exist, create it
     mkdir -p "$folder_path"
@@ -51,15 +51,16 @@ fasta_clean=$(sed -e 's/\(^>.*$\)/#\1#/' "$fasta_file" | tr -d '\n' | sed -e 's/
 printf "%s\n" "$fasta_clean" > 2_mid/clean.fasta
 
 
-
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #GET SEQ NAMES
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #keep only the sequence names which start with ">" then remove the >
 seq_name=$(grep '^>' $fasta_file | sed 's/>//g')
 
+#save file to a mid file to be used for the final output
 printf "%s\n" "$seq_name" > 2_mid/seq_name.txt 
 
+#print out number of sequences in the input fileß
 seq_num=$(cat 2_mid/seq_name.txt|wc -l)
 echo "Processing file with $seq_num sequences..."
 
@@ -140,17 +141,6 @@ echo -e "File $outfile with size $filesize exported successfully"
 
 else 
 
-echo "$outfile doesn't exist check your bash file'"
+echo "$outfile doesn't exist check your bash file"
 
 fi
-
-
-
-
-
-
-
-
-
-
-
