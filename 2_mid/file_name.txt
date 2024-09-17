@@ -1,4 +1,0 @@
-sample1|2021|CO
-sample2|2022|CA
-sample3|2000|CO
-sample4|2013|WA

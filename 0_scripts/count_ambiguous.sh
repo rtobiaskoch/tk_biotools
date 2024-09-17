@@ -24,6 +24,17 @@ if [ ! -d "$folder_path" ]; then
     echo "Directory created: $folder_path"
 fi
 
+
+# Assign the folder path to a variable
+folder_path="3_output"
+
+# Check if the mid folder exists
+if [ ! -d "$folder_path" ]; then
+    # If the folder does not exist, create it
+    mkdir -p "$folder_path"
+    echo "Directory created: $folder_path"
+fi
+
 #check if fasta file 
 if [[ ! $fasta_file =~ \.fasta$|\.fa$ ]] ; then
 	echo "file is not a fasta silly goose!"

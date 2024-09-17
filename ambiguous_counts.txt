@@ -1,7 +1,0 @@
->sample1|2021|CO
-Ambiguous characters: 1
-Ambiguous characters: 2
->sample2|2022|CA
-Ambiguous characters: 0
->sample3|2000|CO
-Ambiguous characters: 9
